@@ -4,16 +4,20 @@ import {
   CardDescription,
   CardTitle,
 } from "@/app/_components/ui/card";
+import NavBar from "../_components/navbar";
 
 const TodoPage = () => {
   return (
-    <Card>
-      <CardTitle>Todo Page</CardTitle>
-      <CardDescription>This is a todo page</CardDescription>
-      <CardContent>
-        <p>Todo page content</p>
-      </CardContent>
-    </Card>
+    <>
+      <NavBar />
+      <Card className="mt-4">
+        <CardTitle>Todo Page</CardTitle>
+        <CardDescription>This is a todo page</CardDescription>
+        <CardContent>
+          <p>Todo page content</p>
+        </CardContent>
+      </Card>
+    </>
   );
 };
 
