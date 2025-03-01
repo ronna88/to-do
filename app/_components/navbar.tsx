@@ -1,3 +1,4 @@
+import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 
 const NavBar = () => {
@@ -8,7 +9,7 @@ const NavBar = () => {
         <Link href="/todo">Minhas Tarefas</Link>
       </div>
       <div>
-        <Link href="/login">Login</Link>
+        <UserButton showName />
       </div>
     </nav>
   );

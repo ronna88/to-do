@@ -6,8 +6,16 @@ import {
   CardDescription,
   CardTitle,
 } from "./_components/ui/card";
+import { SignInButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-const Login = () => {
+const Login = async () => {
+  const { userId } = await auth();
+  if (userId) {
+    redirect("/todo");
+  }
+
   return (
     <>
       <div className="flex justify-center items-center h-screen">
@@ -26,7 +34,9 @@ const Login = () => {
               />
             </div>
             <div className="flex flex-col mt-auto mb-8">
-              <Button>Entrar</Button>
+              <SignInButton>
+                <Button>Entrar</Button>
+              </SignInButton>
             </div>
           </CardContent>
         </Card>
