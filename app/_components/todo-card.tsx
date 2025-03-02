@@ -48,6 +48,10 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
   );
 
   const handleTransferTask = async (todoId: string) => {
+    if (!selectedUser) {
+      toast.error("Selecione um funcionário para transferir a tarefa.");
+      return;
+    }
     await transferTask(todoId, selectedUser);
     toast.success("Tarefa transferida com sucesso!");
     setTimeout(() => {
