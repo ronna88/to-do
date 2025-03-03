@@ -43,6 +43,8 @@ interface ToDoCardProps {
 const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
   const { user } = useUser();
   const role = user?.publicMetadata.role;
+  const phone = user?.publicMetadata.phone as string;
+
   const [selectedUser, setSelectedUser] = useState<string | undefined>(
     undefined
   );
@@ -54,6 +56,8 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
     }
     await transferTask(todoId, selectedUser);
     toast.success("Tarefa transferida com sucesso!");
+    sendWhatsAppNotification(phone);
+
     setTimeout(() => {
       location.reload();
     }, 2000);
@@ -65,6 +69,27 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
     setTimeout(() => {
       location.reload();
     }, 2000);
+  };
+
+  const sendWhatsAppNotification = async (phone: string) => {
+    const evoResponse = await fetch(
+      `${
+        process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+      }/api/clerkusers`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ phone: phone }),
+        cache: "no-store",
+      }
+    );
+    if (evoResponse.ok) {
+      toast.success("Notificação enviada com sucesso!");
+    } else {
+      toast.error("Falha ao enviar notificação.");
+    }
   };
 
   return (
