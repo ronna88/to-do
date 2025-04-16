@@ -64,11 +64,21 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
   };
 
   const handleFinishTask = async (todoId: string) => {
-    await finishTask(todoId);
-    toast.success("Tarefa finalizada com sucesso!");
-    setTimeout(() => {
-      location.reload();
-    }, 2000);
+    await finishTask(todoId)
+      .then((finishRes) => {
+        if (!finishRes) {
+          toast.error("Você não pode finalizar essa tarefa.");
+          return;
+        }
+        toast.success("Tarefa finalizada com sucesso!");
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error(err);
+        toast.error("Erro ao finalizar a tarefa.");
+      });
   };
 
   const sendWhatsAppNotification = async (phone: string) => {

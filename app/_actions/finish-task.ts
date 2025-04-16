@@ -11,7 +11,7 @@ export const finishTask = async (todoId: string) => {
   const todo = await db.todo.findFirst({
     where: {
       id: todoId,
-      worker: userId,
+      // worker: userId,
     },
   });
 
