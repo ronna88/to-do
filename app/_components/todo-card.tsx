@@ -31,8 +31,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { transferTask } from "../_actions/transfer-task";
+import { useRouter } from "next/navigation";
 
 interface ToDoCardProps {
   todos: Todo[];
@@ -41,9 +42,16 @@ interface ToDoCardProps {
 }
 
 const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const role = user?.publicMetadata.role;
   const phone = user?.publicMetadata.phone as string;
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isLoaded && role !== "admin" && profile === "all") {
+      router.push("/todo");
+    }
+  }, [role, router, profile]);
 
   const [selectedUser, setSelectedUser] = useState<string | undefined>(
     undefined
