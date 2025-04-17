@@ -126,7 +126,10 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
       </CardTitle>
       <CardContent className="flex flex-col gap-4 mt-8">
         {todos?.map((todo) => (
-          <div key={todo.id} className="flex justify-between border-b-2 pb-2">
+          <div
+            key={todo.id}
+            className="flex justify-between border-b-2 p-2 hover:bg-gray-300 rounded-md"
+          >
             <span>{todo.description} </span>
             {profile === "all" ? (
               <div className="flex gap-2 justify-center items-center">
