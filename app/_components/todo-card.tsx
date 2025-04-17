@@ -120,13 +120,13 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
   };
 
   return (
-    <Card className="mt-4 w-4/5 p-4">
+    <Card className="mt-4 w-4/5 p-4 ">
       <CardTitle>
         {profile === "all" ? "Todas as Tarefas" : "Minhas Tarefas"}
       </CardTitle>
       <CardContent className="flex flex-col gap-4 mt-8">
         {todos?.map((todo) => (
-          <div key={todo.id} className="flex justify-between">
+          <div key={todo.id} className="flex justify-between border-b-2 pb-2">
             <span>{todo.description} </span>
             {profile === "all" ? (
               <div className="flex gap-2 justify-center items-center">
