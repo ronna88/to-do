@@ -38,13 +38,13 @@ import { useRouter } from "next/navigation";
 interface ToDoCardProps {
   todos: Todo[];
   profile: "user" | "all";
-  users?: { email: string; id: string }[];
+  users?: { email: string; id: string; phone?: string }[]; // Adiciona ? no phone
 }
 
 const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
   const { user, isLoaded } = useUser();
   const role = user?.publicMetadata.role;
-  const phone = user?.publicMetadata.phone as string;
+  // const phone = user?.publicMetadata.phone as string;
   const router = useRouter();
 
   useEffect(() => {
@@ -62,9 +62,18 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
       toast.error("Selecione um funcionário para transferir a tarefa.");
       return;
     }
+    console.log("selectedUser", selectedUser);
+
+    const userPhone = users?.find((u) => u.id === selectedUser)?.phone;
+    if (!userPhone) {
+      toast.error("Funcionário não encontrado.");
+      return;
+    }
+
     await transferTask(todoId, selectedUser);
-    toast.success("Tarefa transferida com sucesso!");
-    sendWhatsAppNotification(phone);
+    // console.log("selectedUser", selectedUser);
+    //toast.success("Tarefa transferida com sucesso!");
+    sendWhatsAppNotification(userPhone);
 
     setTimeout(() => {
       location.reload();

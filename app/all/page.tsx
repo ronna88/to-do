@@ -32,9 +32,15 @@ const AllTodoPage = async () => {
   const clerkUsers = await clerkUsersResponse.json();
 
   const users = clerkUsers.map(
-    (user: { email_addresses: { email_address: string }[]; id: string }) => ({
+    (user: {
+      email_addresses: { email_address: string }[];
+      id: string;
+      public_metadata: { role?: string; phone?: string }; // adicionando aqui
+    }) => ({
       email: user.email_addresses?.[0].email_address || null,
       id: user.id,
+      role: user.public_metadata?.role || null,
+      phone: user.public_metadata?.phone || null,
     })
   );
 
