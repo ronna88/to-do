@@ -52,7 +52,7 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
     if (isLoaded && role !== "admin" && profile === "all") {
       router.push("/todo");
     }
-  }, [role, router, profile]);
+  }, [role, router, profile, isLoaded]);
 
   const [selectedUser, setSelectedUser] = useState<string | undefined>(
     undefined
