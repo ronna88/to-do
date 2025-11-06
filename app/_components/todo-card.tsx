@@ -34,10 +34,11 @@ import {
 import { useEffect, useState } from "react";
 import { transferTask } from "../_actions/transfer-task";
 import { useRouter } from "next/navigation";
+import { reOpenTask } from "../_actions/reopen-task";
 
 interface ToDoCardProps {
   todos: Todo[];
-  profile: "user" | "all";
+  profile: "user" | "all" | "closed";
   users?: { email: string; id: string; phone?: string }[]; // Adiciona ? no phone
 }
 
@@ -74,6 +75,26 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
     // console.log("selectedUser", selectedUser);
     //toast.success("Tarefa transferida com sucesso!");
     sendWhatsAppNotification(userPhone);
+
+    toast.success("Tarefa transferida com sucesso!");
+
+    setTimeout(() => {
+      location.reload();
+    }, 2000);
+  };
+  
+  const handleReOpenTask = async (todo: any) => {
+    console.log("todo: ", todo);
+    await reOpenTask(todo.id);
+
+    if (todo.worker) {
+      const userPhone = users?.find((u) => u.id === todo.worker)?.phone;
+      if (userPhone) {
+        sendWhatsAppNotification(userPhone);
+      }
+    }
+
+    toast.success("Tarefa reaberta com sucesso!");
 
     setTimeout(() => {
       location.reload();
@@ -122,7 +143,9 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
   return (
     <Card className="mt-4 w-4/5 p-4 ">
       <CardTitle>
-        {profile === "all" ? "Todas as Tarefas" : "Minhas Tarefas"}
+        {profile === "all" && "Todas as Tarefas" }
+        {profile === "user" && "Minhas Tarefas"}
+        {profile === "closed" && "Tarefas Fechadas"}
       </CardTitle>
       <CardContent className="flex flex-col gap-4 mt-8">
         {todos?.map((todo) => (
@@ -131,7 +154,7 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
             className="flex justify-between border-b-2 p-2 hover:bg-gray-300 rounded-md"
           >
             <span>{todo.description} </span>
-            {profile === "all" ? (
+            {profile === "all" && (
               <div className="flex gap-2 justify-center items-center">
                 <span>{users?.find((u) => u.id === todo.worker)?.email}</span>
                 {role === "admin" && (
@@ -196,7 +219,73 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
                   </div>
                 )}
               </div>
-            ) : (
+            )}
+
+            {profile === "closed" && (
+              <div className="flex gap-2 justify-center items-center">
+                <span>{users?.find((u) => u.id === todo.worker)?.email}</span>
+                {role === "admin" && (
+                  <div className="flex gap-2">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button className="rounded-full" variant="outline">
+                          Reabrir e Transferir Tarefa
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Reabrir e Transferir Tarefa</DialogTitle>
+                        </DialogHeader>
+                        <Select
+                          value={selectedUser}
+                          onValueChange={(value) => setSelectedUser(value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um funcionário" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Funcionários</SelectLabel>
+                              {users?.map((u) => (
+                                <SelectItem key={u.id} value={u.id}>
+                                  {u.email}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                        <DialogFooter>
+                          <Button
+                            onClick={() => handleTransferTask(todo.id)}
+                            className="rounded-full"
+                          >
+                            Transferir
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button>Reabrir</Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          Deseja realmente reabrir a tarefa?
+                        </AlertDialogHeader>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleReOpenTask(todo)}
+                        >
+                          Reabrir
+                        </AlertDialogAction>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {profile === "user" && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button>Finalizar</Button>
@@ -215,6 +304,7 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
                 </AlertDialogContent>
               </AlertDialog>
             )}
+
           </div>
         ))}
       </CardContent>

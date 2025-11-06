@@ -24,6 +24,7 @@ const NavBar = () => {
       <div className="flex items-center gap-10">
         {admin && <Link href="/all">Todas as Tarefas</Link>}
         <Link href="/todo">Minhas Tarefas</Link>
+        {admin && <Link href="/closed">Tarefas Fechadas</Link>}
       </div>
       <div>
         <UserButton showName />

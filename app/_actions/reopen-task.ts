@@ -2,7 +2,7 @@
 import { db } from "../_lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
-export const transferTask = async (todoId: string, selectedUserId: string) => {
+export const reOpenTask = async (todoId: string) => {
   const { userId } = await auth();
   if (!userId) {
     return null;
@@ -13,7 +13,6 @@ export const transferTask = async (todoId: string, selectedUserId: string) => {
       id: todoId,
     },
     data: {
-      worker: selectedUserId,
       status: "OPEN",
     },
   });

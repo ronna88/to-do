@@ -3,11 +3,6 @@ import { NextResponse } from "next/server";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: Request) {
-  // const { userId } = await auth();
-  /*
-  if (!userId) {
-    return new Response("Unauthorized", { status: 401 });
-  } */
   const clerkApiKey = process.env.CLERK_SECRET_KEY;
 
   if (!clerkApiKey) {
