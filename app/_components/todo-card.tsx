@@ -83,7 +83,7 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
     }, 2000);
   };
   
-  const handleReOpenTask = async (todo: any) => {
+  const handleReOpenTask = async (todo: Todo) => {
     console.log("todo: ", todo);
     await reOpenTask(todo.id);
 
