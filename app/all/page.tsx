@@ -47,8 +47,9 @@ const AllTodoPage = async () => {
   return (
     <>
       <NavBar />
-      <div className="flex justify-center items-center p-2">
-        {todos && <ToDoCard todos={todos} profile="all" users={users} />}
+      <div className="flex justify-center items-center p-2 sm:p-4 md:p-6 w-full">
+        <div className="w-full max-w-7xl">{todos && <ToDoCard todos={todos} profile="all" users={users} />}</div>
+        
       </div>
     </>
   );

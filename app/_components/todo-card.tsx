@@ -141,7 +141,7 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
   };
 
   return (
-    <Card className="mt-4 w-4/5 p-4 ">
+    <Card className="mt-4 w-full sm:w-4/5 p-4">
       <CardTitle>
         {profile === "all" && "Todas as Tarefas" }
         {profile === "user" && "Minhas Tarefas"}
@@ -151,17 +151,17 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
         {todos?.map((todo) => (
           <div
             key={todo.id}
-            className="flex justify-between border-b-2 p-2 hover:bg-gray-300 rounded-md"
+            className="flex flex-col sm:flex-row sm:justify-between border-b-2 p-2 hover:bg-gray-300 rounded-md gap-3"
           >
-            <span>{todo.description} </span>
+            <span className="break-words">{todo.description} </span>
             {profile === "all" && (
-              <div className="flex gap-2 justify-center items-center">
-                <span>{users?.find((u) => u.id === todo.worker)?.email}</span>
+              <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+                <span className="text-sm">{users?.find((u) => u.id === todo.worker)?.email}</span>
                 {role === "admin" && (
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button className="rounded-full" variant="outline">
+                        <Button className="rounded-full w-full sm:w-auto" variant="outline">
                           Transferir Tarefa
                         </Button>
                       </DialogTrigger>
@@ -199,7 +199,7 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
                     </Dialog>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button>Finalizar</Button>
+                        <Button className="w-full sm:w-auto">Finalizar</Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
@@ -222,13 +222,13 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
             )}
 
             {profile === "closed" && (
-              <div className="flex gap-2 justify-center items-center">
-                <span>{users?.find((u) => u.id === todo.worker)?.email}</span>
+              <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+                <span className="text-sm">{users?.find((u) => u.id === todo.worker)?.email}</span>
                 {role === "admin" && (
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button className="rounded-full" variant="outline">
+                        <Button className="rounded-full w-full sm:w-auto" variant="outline">
                           Reabrir e Transferir Tarefa
                         </Button>
                       </DialogTrigger>
@@ -266,7 +266,7 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
                     </Dialog>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button>Reabrir</Button>
+                        <Button className="w-full sm:w-auto">Reabrir</Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
@@ -288,7 +288,7 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
             {profile === "user" && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button>Finalizar</Button>
+                  <Button className="w-full sm:w-auto">Finalizar</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
