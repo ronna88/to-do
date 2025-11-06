@@ -36,12 +36,12 @@ export async function POST(request: Request) {
   const evoResponse = await fetch(`${process.env.NEXT_PUBLIC_EVO_URL}`, {
     method: "POST",
     headers: {
-      apikey: `${evoApiKey}`,
+      token: `${evoApiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      number: "55+" + body.phone,
-      text: `${
+      Phone: "55" + body.phone,
+      Body: `${
         "Olá, você tem uma nova tarefa disponível. Acesse o aplicativo para mais informações. " +
         process.env.NEXT_PUBLIC_TASK_URL
       }`,
