@@ -57,57 +57,94 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
   const [selectedUser, setSelectedUser] = useState<string | undefined>(
     undefined
   );
+  const [isTransferring, setIsTransferring] = useState(false);
+  const [isFinishing, setIsFinishing] = useState(false);
+  const [isReopening, setIsReopening] = useState(false);
 
   const handleTransferTask = async (todoId: string) => {
+    if (isTransferring) return; // Evita múltiplos cliques
+    
     if (!selectedUser) {
       toast.error("Selecione um funcionário para transferir a tarefa.");
       return;
     }
+    
+    setIsTransferring(true);
+    toast.loading("Transferindo tarefa...");
+    
     console.log("selectedUser", selectedUser);
 
     const userPhone = users?.find((u) => u.id === selectedUser)?.phone;
     if (!userPhone) {
+      toast.dismiss();
       toast.error("Funcionário não encontrado.");
+      setIsTransferring(false);
       return;
     }
 
-    await transferTask(todoId, selectedUser);
-    // console.log("selectedUser", selectedUser);
-    //toast.success("Tarefa transferida com sucesso!");
-    sendWhatsAppNotification(userPhone);
+    try {
+      await transferTask(todoId, selectedUser);
+      sendWhatsAppNotification(userPhone);
 
-    toast.success("Tarefa transferida com sucesso!");
+      toast.dismiss();
+      toast.success("Tarefa transferida com sucesso!");
 
-    setTimeout(() => {
-      location.reload();
-    }, 2000);
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Erro ao transferir tarefa.");
+      setIsTransferring(false);
+    }
   };
   
   const handleReOpenTask = async (todo: Todo) => {
+    if (isReopening) return; // Evita múltiplos cliques
+    
+    setIsReopening(true);
+    toast.loading("Reabrindo tarefa...");
+    
     console.log("todo: ", todo);
-    await reOpenTask(todo.id);
+    
+    try {
+      await reOpenTask(todo.id);
 
-    if (todo.worker) {
-      const userPhone = users?.find((u) => u.id === todo.worker)?.phone;
-      if (userPhone) {
-        sendWhatsAppNotification(userPhone);
+      if (todo.worker) {
+        const userPhone = users?.find((u) => u.id === todo.worker)?.phone;
+        if (userPhone) {
+          sendWhatsAppNotification(userPhone);
+        }
       }
+
+      toast.dismiss();
+      toast.success("Tarefa reaberta com sucesso!");
+
+      setTimeout(() => {
+        location.reload();
+      }, 2000);
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Erro ao reabrir tarefa.");
+      setIsReopening(false);
     }
-
-    toast.success("Tarefa reaberta com sucesso!");
-
-    setTimeout(() => {
-      location.reload();
-    }, 2000);
   };
 
   const handleFinishTask = async (todoId: string) => {
+    if (isFinishing) return; // Evita múltiplos cliques
+    
+    setIsFinishing(true);
+    toast.loading("Finalizando tarefa...");
+    
     await finishTask(todoId)
       .then((finishRes) => {
         if (!finishRes) {
+          toast.dismiss();
           toast.error("Você não pode finalizar essa tarefa.");
+          setIsFinishing(false);
           return;
         }
+        toast.dismiss();
         toast.success("Tarefa finalizada com sucesso!");
         setTimeout(() => {
           location.reload();
@@ -115,7 +152,9 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
       })
       .catch((err) => {
         console.error(err);
+        toast.dismiss();
         toast.error("Erro ao finalizar a tarefa.");
+        setIsFinishing(false);
       });
   };
 
@@ -191,15 +230,16 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
                           <Button
                             onClick={() => handleTransferTask(todo.id)}
                             className="rounded-full"
+                            disabled={isTransferring}
                           >
-                            Transferir
+                            {isTransferring ? "Transferindo..." : "Transferir"}
                           </Button>
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button className="w-full sm:w-auto">Finalizar</Button>
+                        <Button className="w-full sm:w-auto" disabled={isFinishing}>Finalizar</Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
@@ -211,8 +251,9 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => handleFinishTask(todo.id)}
+                          disabled={isFinishing}
                         >
-                          Finalizar
+                          {isFinishing ? "Finalizando..." : "Finalizar"}
                         </AlertDialogAction>
                       </AlertDialogContent>
                     </AlertDialog>
@@ -258,15 +299,16 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
                           <Button
                             onClick={() => handleTransferTask(todo.id)}
                             className="rounded-full"
+                            disabled={isTransferring}
                           >
-                            Transferir
+                            {isTransferring ? "Transferindo..." : "Transferir"}
                           </Button>
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button className="w-full sm:w-auto">Reabrir</Button>
+                        <Button className="w-full sm:w-auto" disabled={isReopening}>Reabrir</Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
@@ -275,8 +317,9 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
                         <AlertDialogCancel>Cancelar</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => handleReOpenTask(todo)}
+                          disabled={isReopening}
                         >
-                          Reabrir
+                          {isReopening ? "Reabrindo..." : "Reabrir"}
                         </AlertDialogAction>
                       </AlertDialogContent>
                     </AlertDialog>
@@ -288,7 +331,7 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
             {profile === "user" && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button className="w-full sm:w-auto">Finalizar</Button>
+                  <Button className="w-full sm:w-auto" disabled={isFinishing}>Finalizar</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
@@ -298,8 +341,11 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
                     Esta ação não poderá ser desfeita.
                   </AlertDialogDescription>
                   <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => handleFinishTask(todo.id)}>
-                    Finalizar
+                  <AlertDialogAction 
+                    onClick={() => handleFinishTask(todo.id)}
+                    disabled={isFinishing}
+                  >
+                    {isFinishing ? "Finalizando..." : "Finalizar"}
                   </AlertDialogAction>
                 </AlertDialogContent>
               </AlertDialog>
