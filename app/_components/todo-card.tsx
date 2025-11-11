@@ -220,7 +220,7 @@ const ToDoCard = ({ todos, profile, users, currentPage, totalPages }: ToDoCardPr
         {profile === "closed" && "Tarefas Fechadas"}
       </CardTitle>
       <CardContent className="flex flex-col gap-4 mt-8">
-        <div className="w-full lg:w-1/4">
+        {profile !== "user" && <div className="w-full lg:w-1/4">
           <Input 
             type="text" 
             placeholder="Buscar por funcionario..." 
@@ -228,6 +228,7 @@ const ToDoCard = ({ todos, profile, users, currentPage, totalPages }: ToDoCardPr
             value={searchQuery}
           />
         </div>
+}
         
         
         {filteredTodos.length === 0 && searchQuery !== "" ? (<p className="text-center text-muted-foreground py-8">
