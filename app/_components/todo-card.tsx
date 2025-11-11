@@ -33,20 +33,33 @@ import {
 } from "./ui/select";
 import { useEffect, useState } from "react";
 import { transferTask } from "../_actions/transfer-task";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { reOpenTask } from "../_actions/reopen-task";
+import { Input } from "./ui/input";
+import Pagination from "../_components/_pagination/page";
 
 interface ToDoCardProps {
   todos: Todo[];
   profile: "user" | "all" | "closed";
-  users?: { email: string; id: string; phone?: string }[]; // Adiciona ? no phone
+  users?: { email: string; id: string; phone?: string }[]; 
+  currentPage: number;
+  totalPages: number;
 }
 
-const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
+const ToDoCard = ({ todos, profile, users, currentPage, totalPages }: ToDoCardProps) => {
   const { user, isLoaded } = useUser();
   const role = user?.publicMetadata.role;
-  // const phone = user?.publicMetadata.phone as string;
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [filteredTodos, setFilteredTodos] = useState<Todo[]>(todos);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isTransferring, setIsTransferring] = useState(false);
+  const [isFinishing, setIsFinishing] = useState(false);
+  const [isReopening, setIsReopening] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<string | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     if (isLoaded && role !== "admin" && profile === "all") {
@@ -54,12 +67,30 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
     }
   }, [role, router, profile, isLoaded]);
 
-  const [selectedUser, setSelectedUser] = useState<string | undefined>(
-    undefined
-  );
-  const [isTransferring, setIsTransferring] = useState(false);
-  const [isFinishing, setIsFinishing] = useState(false);
-  const [isReopening, setIsReopening] = useState(false);
+  useEffect(() => {
+    setFilteredTodos(todos);
+  }, [todos]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      
+      const params = new URLSearchParams(searchParams.toString());
+      
+      if (searchQuery === "") {
+        params.delete("search");
+      } else {
+        params.set("search", searchQuery);
+        params.set("page", "1"); // Volta para página 1 ao buscar
+      }
+      
+      router.push(`?${params.toString()}`);
+    }, 500); // Aguarda 500ms após parar de digitar
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [searchQuery, router, searchParams]);
+  
 
   const handleTransferTask = async (todoId: string) => {
     if (isTransferring) return; // Evita múltiplos cliques
@@ -104,8 +135,6 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
     
     setIsReopening(true);
     toast.loading("Reabrindo tarefa...");
-    
-    console.log("todo: ", todo);
     
     try {
       await reOpenTask(todo.id);
@@ -179,6 +208,10 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
     }
   };
 
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
   return (
     <Card className="mt-4 w-full sm:w-4/5 p-4">
       <CardTitle>
@@ -187,7 +220,19 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
         {profile === "closed" && "Tarefas Fechadas"}
       </CardTitle>
       <CardContent className="flex flex-col gap-4 mt-8">
-        {todos?.map((todo) => (
+        <div className="w-full lg:w-1/4">
+          <Input 
+            type="text" 
+            placeholder="Buscar por funcionario..." 
+            onChange={handleSearch} 
+            value={searchQuery}
+          />
+        </div>
+        
+        
+        {filteredTodos.length === 0 && searchQuery !== "" ? (<p className="text-center text-muted-foreground py-8">
+            Nenhuma tarefa encontrada
+          </p>):(filteredTodos?.map((todo) => (
           <div
             key={todo.id}
             className="flex flex-col sm:flex-row sm:justify-between border-b-2 p-2 hover:bg-gray-300 rounded-md gap-3"
@@ -352,7 +397,8 @@ const ToDoCard = ({ todos, profile, users }: ToDoCardProps) => {
             )}
 
           </div>
-        ))}
+        )))}
+        <Pagination currentPage={currentPage} totalPages={totalPages} />
       </CardContent>
     </Card>
   );

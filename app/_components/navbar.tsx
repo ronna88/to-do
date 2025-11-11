@@ -21,7 +21,6 @@ const NavBar = () => {
     }
   }, [role, isLoaded]);
 
-  console.log("role", role);
   return (
     <nav className="flex justify-between items-center border-b border-solid px-4 sm:px-8 py-4 relative">
       {/* Menu Hambúrguer - Mobile */}
